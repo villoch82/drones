@@ -19,7 +19,7 @@ export class DronesFleetService {
             sn: 'ABC_2',
             model: DroneModel.CW,
             weight_limit : 600,
-            battery_capacity : 18,
+            battery_capacity : 18, 
             state : DroneState.DELIVERING,
         }
     ];
