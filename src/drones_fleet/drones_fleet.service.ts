@@ -1,6 +1,4 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { response } from 'express';
-import { STATUS_CODES } from 'http';
 import { Drone, DroneModel, DroneState, Load, Medication } from './drones_fleet.model';
 import { LoadDroneDTO } from './dto/loadDrone.dto';
 import { RegisterDroneDTO } from './dto/registerDrone.dto';
@@ -89,11 +87,11 @@ export class DronesFleetService {
         if (drone.battery_capacity >= 25)
             drone.state = DroneState.LOADING;
         else
-            throw new HttpException("Actual battery exceed drone's weigth limit", HttpStatus.BAD_REQUEST);
+            throw new HttpException("Actual battery capacity is not enought for load the drone.", HttpStatus.BAD_REQUEST);
 
         //prevent the dorne from being loaded with more weight that it can carry
         if ( medication.weight > (drone.weight_limit - this.getDroneLoadedWeight(drone_sn) ))
-            throw new HttpException("Actual cargo exceed drone's weigth limit", HttpStatus.BAD_REQUEST);
+            throw new HttpException("Actual cargo exceed drone's weigth limit.", HttpStatus.BAD_REQUEST);
 
 
 
@@ -128,7 +126,10 @@ export class DronesFleetService {
     checkDroneBatteryLevel(drone_sn: string) : number {
         let drones = this.drones.find(drone => drone.sn === drone_sn)
 
-        return drones['battery_capacity']
+        if(drones)
+            return drones.battery_capacity;
+        else
+        throw new HttpException("No drones match the identification supplied", HttpStatus.BAD_REQUEST);
     }
 
     private getDronebyId(drone_sn: string) : Drone {
