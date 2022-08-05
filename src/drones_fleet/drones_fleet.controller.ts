@@ -1,14 +1,21 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Post, UsePipes, ValidationPipe } from '@nestjs/common';
 import { DronesFleetService } from './drones_fleet.service';
 import { RegisterDroneDTO } from './dto/registerDrone.dto';
 import { LoadDroneDTO } from './dto/loadDrone.dto';
+import { DroneModelValidationPipe } from './pipes/droneModelValidation.pipes';
+import { DroneModel } from './drones_fleet.model';
 
 @Controller('drones-fleet')
 export class DronesFleetController {
     constructor(private dronesFleetService: DronesFleetService){}
 
     @Post()
-    registerDrone(@Body() registerDroneDTO: RegisterDroneDTO){
+    @UsePipes(ValidationPipe)
+    registerDrone(
+        @Body() registerDroneDTO: RegisterDroneDTO,
+        @Body('model', DroneModelValidationPipe) model : DroneModel,
+
+    ){
         return this.dronesFleetService.registerDrone(registerDroneDTO);
     }
 

@@ -1,6 +1,7 @@
-
+//Drones
 
 export interface Drone {
+    //id: string;
     sn: string;
     model: DroneModel;
     weight_limit : number,
@@ -9,7 +10,7 @@ export interface Drone {
 }
 
 export enum DroneModel {
-    LW = 'LightWeight',
+    LW = 'Lightweight',
     MW = 'Middleweight',
     CW = 'Cruiserweight',
     HW = 'Heavyweight',
@@ -23,6 +24,8 @@ export enum DroneState {
     RETURNING = 'RETURNING'
 }
 
+//Medications
+
 export interface Medication {
     id : string,
     name: string,
@@ -31,6 +34,7 @@ export interface Medication {
     image : string,
 }
 
+//Drones <=> Medications ManyToMany
 export interface Load {
     drone_sn : string,
     medication_id : string,

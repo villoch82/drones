@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { BadRequestException, HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { Drone, DroneModel, DroneState, Load, Medication } from './drones_fleet.model';
 import { LoadDroneDTO } from './dto/loadDrone.dto';
 import { RegisterDroneDTO } from './dto/registerDrone.dto';
@@ -57,14 +57,14 @@ export class DronesFleetService {
         }
     ];
 
-    registerDrone(registerDroneDTO: RegisterDroneDTO) : Drone{
-        const {sn, model, weight_limit} = registerDroneDTO;
+    registerDrone(registerDroneDTO: RegisterDroneDTO) : Drone {
+        const {sn, model, weight_limit, battery_capacity} = registerDroneDTO;
 
         const drone: Drone = {
             sn,
             model,
             weight_limit,
-            battery_capacity : 100,
+            battery_capacity,
             state : DroneState.IDLE,
         };
 
@@ -87,11 +87,11 @@ export class DronesFleetService {
         if (drone.battery_capacity >= 25)
             drone.state = DroneState.LOADING;
         else
-            throw new HttpException("Actual battery capacity is not enought for load the drone.", HttpStatus.BAD_REQUEST);
+            throw new BadRequestException("Actual battery capacity is not enought for load the drone.");
 
         //prevent the dorne from being loaded with more weight that it can carry
         if ( medication.weight > (drone.weight_limit - this.getDroneLoadedWeight(drone_sn) ))
-            throw new HttpException("Actual cargo exceed drone's weigth limit.", HttpStatus.BAD_REQUEST);
+            throw new BadRequestException("Actual cargo exceed drone's weigth limit.");
 
 
 
@@ -129,15 +129,26 @@ export class DronesFleetService {
         if(drones)
             return drones.battery_capacity;
         else
-        throw new HttpException("No drones match the identification supplied", HttpStatus.BAD_REQUEST);
+            throw new NotFoundException("No drones match the identification supplied");
+        
     }
 
     private getDronebyId(drone_sn: string) : Drone {
-        return this.drones.find(drone => drone.sn === drone_sn);
+        const drone = this.drones.find(drone => drone.sn === drone_sn);
+
+        if (! drone ) 
+            throw new NotFoundException("No drones matchs the identification supplied");
+
+        return drone;
     }
 
     private getMedicationbyId(id: string) : Medication {
-        return this.medication.find(med => med.id === id);
+        const med = this.medication.find(med => med.id === id);
+
+        if (! med ) 
+        throw new NotFoundException("No medications matchs the identification supplied");
+
+    return med;
     }
 
     private getDroneLoadedWeight(drone_sn : string) : number {

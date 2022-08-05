@@ -1,7 +1,19 @@
-import { DroneModel } from "../drones_fleet.model"
+import { IsNotEmpty, IsNumber, IsString, Length, Matches, MaxLength } from "class-validator";
+import { DroneModel, DroneState } from '../drones_fleet.model';
 
 export class RegisterDroneDTO {
+    @IsString()
+    @IsNotEmpty()
+    @MaxLength(100)
+   
     sn: string;
+
+    @IsNotEmpty()
     model: DroneModel;
+
+    @IsNotEmpty()
     weight_limit: number;
+
+    @IsNumber()
+    battery_capacity : number;
 }
