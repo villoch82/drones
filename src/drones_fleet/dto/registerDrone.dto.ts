@@ -1,5 +1,5 @@
 import { IsNotEmpty, IsNumber, IsString, Length, Matches, MaxLength } from "class-validator";
-import { DroneModel, DroneState } from '../drones_fleet.model';
+import { DroneModel, DroneState } from '../drones_fleet.interface';
 
 export class RegisterDroneDTO {
     @IsString()

@@ -1,19 +1,19 @@
 import { NotFoundException } from "@nestjs/common";
-import { Drone, DroneModel, DroneState, Load, Medication } from "./drones_fleet.model";
+import { Drone, DroneModel, DroneState, Load, Medication } from "./drones_fleet.interface";
 import { LoadDroneDTO } from "./dto/loadDrone.dto";
 
 export class DronesFleetRepository {
     private drones : Drone[] = [
         {
             sn: 'D1',
-            model: DroneModel.CW,
+            model: DroneModel.MW,
             weight_limit : 1000,
             battery_capacity : 95,
             state : DroneState.LOADING,
         },
         {
             sn: 'D2',
-            model: DroneModel.CW,
+            model: DroneModel.LW,
             weight_limit : 600,
             battery_capacity : 18, 
             state : DroneState.DELIVERING,
@@ -26,6 +26,14 @@ export class DronesFleetRepository {
             battery_capacity : 1, 
             state : DroneState.IDLE,
         }
+        ,
+        {
+            sn: 'D4',
+            model: DroneModel.HW,
+            weight_limit : 5000,
+            battery_capacity : 1, 
+            state : DroneState.IDLE,
+        }
     ];
 
     private medication : Medication[] = [
@@ -33,33 +41,66 @@ export class DronesFleetRepository {
             id : '1',
             name: 'Medicine 1',
             weight : 300,
-            code : 'ABC_123',
+            code : 'MED_01',
             image : '/url_to_image/3',
         },
         {
             id : '2',
             name: 'Medicine 2',
             weight : 400,
-            code : 'ABC_124',
+            code : 'MED_01',
             image : '/url_to_image/4',
         },
         {
             id : '3',
             name: 'Medicine 3',
+            weight : 650,
+            code : 'MED_01',
+            image : '/url_to_image/14',
+        },
+        {
+            id : '4',
+            name: 'Medicine 3',
             weight : 900,
-            code : 'ABC_154',
+            code : 'MED_04',
+            image : '/url_to_image/14',
+        },
+        {
+            id : '5',
+            name: 'Medicine 3',
+            weight : 200,
+            code : 'MED_05',
+            image : '/url_to_image/14',
+        },
+        {
+            id : '6',
+            name: 'Medicine 6',
+            weight : 1900,
+            code : 'MED_06',
             image : '/url_to_image/14',
         },
     ];
 
     private load : Load[] = [
         {
-            drone_sn : 'ABC_1',
+            drone_sn : 'D1',
             medication_id : '1',
         },
         {
-            drone_sn : 'ABC_1',
+            drone_sn : 'D1',
             medication_id : '2',
+        },
+        {
+            drone_sn : 'D2',
+            medication_id : '3',
+        },
+        {
+            drone_sn : 'D3',
+            medication_id : '4',
+        }        ,
+        {
+            drone_sn : 'D3',
+            medication_id : '5',
         }
     ];
 
@@ -116,8 +157,6 @@ export class DronesFleetRepository {
     return med;
     }
 
-
-
     getDroneLoadedWeight(drone_sn : string) : number {
 
         let weight = 0;
@@ -130,9 +169,11 @@ export class DronesFleetRepository {
     }
 
     getDroneCargo(drone_sn: string): Medication[] {
-        const drone_load = this.load.filter(load => load.drone_sn === drone_sn);
-        let meds_loaded : Medication[] = [];
+        let drone = this.getDronebyId(drone_sn);
 
+        const drone_load = this.load.filter(load => load.drone_sn === drone.sn);
+
+        let meds_loaded : Medication[] = [];
         drone_load.forEach(med => meds_loaded.push(this.getMedicationbyId(med.medication_id)))
 
         return meds_loaded;

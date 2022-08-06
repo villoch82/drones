@@ -24,7 +24,6 @@ export enum DroneState {
 }
 
 //Medications
-
 export interface Medication {
     id : string, //key
     name: string,

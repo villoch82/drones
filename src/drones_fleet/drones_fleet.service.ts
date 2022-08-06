@@ -1,5 +1,5 @@
 import { BadRequestException, HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
-import { Drone, DroneModel, DroneState, Load, Medication } from './drones_fleet.model';
+import { Drone, DroneModel, DroneState, Load, Medication } from './drones_fleet.interface';
 import { LoadDroneDTO } from './dto/loadDrone.dto';
 import { RegisterDroneDTO } from './dto/registerDrone.dto';
 import { DronesFleetRepository } from './drones_fleet.repository';
@@ -33,6 +33,7 @@ export class DronesFleetService {
 
         let drone = this.dronesFleetRepository.getDronebyId(drone_sn);
         let medication = this.dronesFleetRepository.getMedicationbyId(medication_id);
+        
 
         if(drone.state != DroneState.IDLE &&  drone.state != DroneState.LOADING)
             throw new BadRequestException("Drone's must be in IDLE or LOADING state.");
@@ -52,7 +53,10 @@ export class DronesFleetService {
     }
 
     checkDroneCargo(drone_sn: string): Medication[] {
-        return this.dronesFleetRepository.getDroneCargo(drone_sn);
+        const dronesCargo = this.dronesFleetRepository.getDroneCargo(drone_sn);
+        if (dronesCargo.length == 0)
+            throw new NotFoundException("Drone has no medication items loaded");
+        return dronesCargo;
     }
 
     checkDronesAvailables() : Drone[] {

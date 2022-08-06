@@ -4,7 +4,7 @@ import {
     PipeTransform,
 } from '@nestjs/common';
 
-import { DroneModel } from '../drones_fleet.model';
+import { DroneModel } from '../drones_fleet.interface';
 
 export class DroneModelValidationPipe implements PipeTransform {
     readonly allowedModels = [DroneModel.CW, DroneModel.HW, DroneModel.LW, DroneModel.MW];

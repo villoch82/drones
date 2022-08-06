@@ -3,7 +3,7 @@ import { DronesFleetService } from './drones_fleet.service';
 import { RegisterDroneDTO } from './dto/registerDrone.dto';
 import { LoadDroneDTO } from './dto/loadDrone.dto';
 import { DroneModelValidationPipe } from './pipes/droneModelValidation.pipes';
-import { DroneModel } from './drones_fleet.model';
+import { DroneModel } from './drones_fleet.interface';
 
 @Controller('drones-fleet')
 export class DronesFleetController {
