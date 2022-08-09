@@ -19,6 +19,7 @@ describe('DronesService', () => {
     });
 
     describe('registerDrones', () => {
+
         it('register drone', () => {
             const registerDroneDTO:  RegisterDroneDTO = {
                 sn: 'TEST1',
@@ -34,8 +35,7 @@ describe('DronesService', () => {
                 "battery_capacity": 100,
                 "state": "IDLE"
             };
-
             expect(droneFleetService.registerDrone(registerDroneDTO)).toStrictEqual(resultExpected);
-        })
+        });
     })
 });
