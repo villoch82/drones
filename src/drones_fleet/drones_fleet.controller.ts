@@ -34,13 +34,10 @@ export class DronesFleetController {
         return this.dronesFleetService.checkDroneBatteryLevel(drone_sn);
     }
 
-
     @Get('/:drone_sn')
     checkDroneLoad(@Param('drone_sn') drone_sn : string): any {
         return this.dronesFleetService.checkDroneCargo(drone_sn);
     }
-
-
 }
 function Params() {
     throw new Error('Function not implemented.');

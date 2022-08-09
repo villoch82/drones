@@ -104,29 +104,12 @@ export class DronesFleetRepository {
         }
     ];
 
-    dronesLength(){
+    getDronesLength(){
         return this.drones.length;
     }
 
-    dronesAppend(drone: Drone) {
-        return this.drones.push(drone);
-    }
-
-    dronesModifyState(drone_obj : Drone, state: DroneState) {
-        let mod = this.drones.find(drone => drone.sn === drone_obj.sn);
-        mod.state = state;
-    }
-
-    loadDrone(loadDroneDTO :  LoadDroneDTO){
-        const { drone_sn, medication_id} = loadDroneDTO;
-
-        const load : Load = {
-            drone_sn,
-            medication_id
-        }
-
-        this.load.push(load);
-        return load;
+    getDrones() : Drone[] {
+        return this.drones;
     }
 
     getDronesAvailables() : Drone[] {
@@ -177,5 +160,26 @@ export class DronesFleetRepository {
         drone_load.forEach(med => meds_loaded.push(this.getMedicationbyId(med.medication_id)))
 
         return meds_loaded;
+    }
+
+    modifyDroneState(drone_obj : Drone, state: DroneState) {
+        let mod = this.drones.find(drone => drone.sn === drone_obj.sn);
+        mod.state = state;
+    }
+
+    registerDrone(drone: Drone) {
+        return this.drones.push(drone);
+    }
+
+    loadDrone(loadDroneDTO :  LoadDroneDTO){
+        const { drone_sn, medication_id} = loadDroneDTO;
+
+        const load : Load = {
+            drone_sn,
+            medication_id
+        }
+
+        this.load.push(load);
+        return load;
     }
 }

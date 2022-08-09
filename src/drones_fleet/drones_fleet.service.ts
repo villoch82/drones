@@ -1,13 +1,15 @@
-import { BadRequestException, HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, HttpException, HttpStatus, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { Drone, DroneModel, DroneState, Load, Medication } from './drones_fleet.interface';
 import { LoadDroneDTO } from './dto/loadDrone.dto';
 import { RegisterDroneDTO } from './dto/registerDrone.dto';
 import { DronesFleetRepository } from './drones_fleet.repository';
+import { Cron } from '@nestjs/schedule';
 
 @Injectable()
 export class DronesFleetService {
     
     private readonly dronesFleetRepository = new DronesFleetRepository();
+    private logger = new Logger('DronesFleetService');
 
     registerDrone(registerDroneDTO: RegisterDroneDTO) : Drone {
         const {sn, model, weight_limit, battery_capacity} = registerDroneDTO;
@@ -21,10 +23,10 @@ export class DronesFleetService {
         };
 
         //Prevent register more than 10 drones
-        if( this.dronesFleetRepository.dronesLength() < 10 ) 
-            this.dronesFleetRepository.dronesAppend(drone);
+        if( this.dronesFleetRepository.getDronesLength() < 10 ) 
+            this.dronesFleetRepository.registerDrone(drone);
         else
-            return null;
+            throw new BadRequestException('The fleet is alredy completed');
         return drone;
     }
 
@@ -41,9 +43,9 @@ export class DronesFleetService {
         //Set the drone status to LOADING and 
         //preventing the drone from being in this state if battery level < 25%
         if (drone.battery_capacity >= 25)
-            this.dronesFleetRepository.dronesModifyState(drone, DroneState.LOADING);
+            this.dronesFleetRepository.modifyDroneState(drone, DroneState.LOADING);
         else
-            throw new BadRequestException("Actual battery capacity is not enought for load the drone.");
+            throw new BadRequestException("Actual battery capacity is not enought to load the drone.");
 
         //prevent the dorne from being loaded with more weight that it can carry
         if ( medication.weight > (drone.weight_limit - this.dronesFleetRepository.getDroneLoadedWeight(drone_sn) ))
@@ -66,6 +68,17 @@ export class DronesFleetService {
     checkDroneBatteryLevel(drone_sn: string) : number {
         let drone = this.dronesFleetRepository.getDronebyId(drone_sn);
         return drone.battery_capacity;   
+    }
+
+
+    @Cron('10 * * * * *')
+    checkDronesBatteryLevel() {
+        let drones = this.dronesFleetRepository.getDrones();
+
+        for ( let i = 0; i < drones.length; i++ ){
+            this.logger.log('Drone ' + drones[i].sn + ', battery level: ' + drones[i].battery_capacity);
+        }
+
     }
 
 
